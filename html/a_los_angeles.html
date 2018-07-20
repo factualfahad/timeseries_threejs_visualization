@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Factual Data Art!</title>
+  <style>
+    body { margin: 0; 
+          background-color: black;}
+    canvs { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+    <div style="text-align:center; color:white;  font-family: 'Helvetica Neue'; ">
+      <p id='date'>Date: July,3rd 2018</p>
+            <p id='time'></p>
+    </div>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+    <script src="../build/three.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/renderers/Projector.js"></script>
+    <script src="js/renderers/CanvasRenderer.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    <script src="la_points.js"></script>
+    <script src="la_colors.js"></script>
+
+  <script>
+    (
+    	function() {
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color( 0x000001 );
+      var camera = new THREE.PerspectiveCamera(
+        75,                                      // Field of View
+        window.innerWidth / window.innerHeight,  // aspect ratio
+        0.1,                                     // near clipping plane
+        1000                                     // far clipping plane
+      );
+      var renderer = new THREE.WebGLRenderer({
+        alpha: true,     // transparent background
+        antialias: true  // smooth edges
+      });
+      renderer.setSize(window.innerWidth-20, window.innerHeight-85,false);
+      document.body.appendChild(renderer.domElement);
+      document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+
+
+    var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
+        map:THREE.ImageUtils.loadTexture('mapbox_base_LA.png')
+    });
+
+    img.map.needsUpdate = true; //ADDED
+    var plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2,1),img);
+    plane.overdraw = true;
+    scene.add(plane);
+
+
+      //var texturePainting = new THREE.TextureLoader().load( "mapbox_base_LA.png" );
+				
+
+      //scene.add(cube);
+      camera.position.z = 1.5; // move camera back so we can see the cube
+
+
+      //rm_s
+
+
+        var color=new THREE.Color( 1,1,1 ); 
+        var width=300;
+        var length= 300;
+        var geometry = new THREE.BufferGeometry();
+        var numPoints = width*length;
+        var positions = new Float32Array( numPoints*3 );
+        var colors = new Float32Array( numPoints*3 );
+        var k = 0;
+        for( var i = 0; i < width; i++ ) {
+          for( var j = 0; j < length; j++ ) {
+            var u = i / width;
+            var v = j / length;
+            var x = u- 0.5;
+            var y = 0;//Math.sin(k) / 20;
+            var z = v - 0.5;
+            positions[ 3 * k ] = 2*x;
+            positions[ 3 * k + 1 ] = 0.2;
+            positions[ 3 * k + 2 ] = 2*z;
+            colors[ 3 * k ] = 0.8;//color.r * intensity;
+            colors[ 3 * k + 1 ] = 0.4;//color.g * intensity;
+            colors[ 3 * k + 2 ] = 0.;//color.b * intensity;
+            k++;
+          }
+
+        }
+
+        var current_time=1;
+        geometry.addAttribute( 'position', new THREE.BufferAttribute( pointss[current_time], 3 ) );
+        geometry.addAttribute( 'color', new THREE.BufferAttribute( colorss[current_time], 3 ) );
+        geometry.computeBoundingBox();
+        var pointSize=0.003;
+        var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
+        var pointcloud = new THREE.Points( geometry, material );
+        pointcloud.scale.set( 1,1,1 );
+        pointcloud.position.set( 0,0,0.01 );
+        scene.add( pointcloud );
+        var counter=0;
+
+      //rm_e
+
+
+      //adding code snippet for the wave
+      //end of the code snupp
+      function onDocumentMouseWheel( event ) {
+	      	tmp=camera.position.z -Math.sign(event.wheelDeltaY);
+	      	camera.position.z=tmp;
+	};
+        //fix this later
+        var controls = new THREE.OrbitControls( camera);
+                pointcloud.rotation.y=-1.53;
+        var render = function() {
+        
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+        counter++;
+        if (counter%50==0)
+        {
+            document.getElementById("time").innerHTML = "Time:  "+current_time+":00";
+            geometry.addAttribute( 'position', new THREE.BufferAttribute( pointss[current_time], 3 ) );
+            geometry.addAttribute( 'color', new THREE.BufferAttribute( colorss[current_time], 3 ) );
+            current_time++; 
+
+            if(current_time>23)
+              current_time=0;
+        }     
+
+        plane.rotation.x = -1;
+        plane.rotation.y = 0;
+        //plane.rotation.z += 0.001;
+
+        pointcloud.rotation.x=0.59;
+        //pointcloud.rotation.y+=0.001; 
+        pointcloud.rotation.z=0 ;
+      };
+
+      //var tt=new THREE.TextGeometry( "testing" );
+      //scene.add(tt);
+       
+      render();
+    })();
+  </script>
+
+</body>
+</html>
